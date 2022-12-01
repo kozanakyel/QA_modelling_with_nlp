@@ -176,7 +176,7 @@ def get_result_with_mean(df_t: pd.DataFrame()):
     df_t['get_mean_all_results'] = (df_t['similarity_to_true'] + df_t['score_label'] + df_t['get_multiqa_score'])/3
 
 if __name__ == '__main__':
-    df = pd.read_csv('/mnt/c/Users/kozan/Desktop/NLP/qa_modelling_with_nlp/QAs.txt',usecols=[0,1], 
+    df = pd.read_csv('/mnt/c/Users/kozan/Desktop/NLP/QA_modelling_with_nlp/QAs.txt',usecols=[0,1], 
             names=['ans_index', 'answer'], header=None, sep='\t')
     df = cleaning_data(df)
     add_sent_numbers(df)
