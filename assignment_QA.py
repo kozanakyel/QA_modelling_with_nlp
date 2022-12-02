@@ -184,14 +184,16 @@ if __name__ == '__main__':
 
     print(f'GIVE AN CORRECT ANSWER AND TYPE **ENTER** FOR INPUT:\n')
     query = input()
-    get_multi_qa_score(df, query)
+
+    question = "How does the abstraction helps engineering ?"
+    get_multi_qa_score(df, question)
 
     score_list = get_score_with_BERT_SQUAD(df)
     add_score_and_status_binary(score_list, df)
     
     correct_answer_sentences = extract_answer_from_complete_text(df)
     print(f'\n\n#############Correct Answer From compound Answer Text is ########### \n\"{correct_answer_sentences}\"')
-    get_similarities_correct_answers(correct_answer_sentences, df)
+    get_similarities_correct_answers(query, df)
 
     create_pipeline_tfid_and_model(LinearSVC(), df, 'LinearSVC')
     create_pipeline_tfid_and_model(XGBClassifier(), df, 'Xgboost')
