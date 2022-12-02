@@ -30,6 +30,9 @@ warnings.filterwarnings("ignore", message=r"\[W008\]", category=UserWarning)
 
 
 def cleaning_data(df: pd.DataFrame()):
+    """
+    Cleaning data for answers and drop NaN, Whitespace rows
+    """
     df_c = df.copy()
     df_c.dropna(inplace=True)
     blanks = []
@@ -46,6 +49,9 @@ def cleaning_data(df: pd.DataFrame()):
     return df_c
 
 def add_sent_numbers(df_temp: pd.DataFrame()):
+    """
+    Added Sentence numbers for dataset
+    """
     df_temp['sent_numbers'] = 0
     for i, ans_ind, answers, sent_no in df_temp.itertuples():  
         doc_temp = nlp(answers)
@@ -63,6 +69,9 @@ def uncommon_words(A, B):
     return [word for word in count if count[word] == 1]
 
 def auto_correct_spelling_words(df_t: pd.DataFrame()):
+    """
+    Autocorrect and Spelling with Textblob
+    """
     spelling_words = []
     for i in df_t.index:
         cleaning_answer = re.findall("[a-zA-Z,.]+",df_t.answer[i])
@@ -78,6 +87,9 @@ def Tokenizer(str_input):
     return words
 
 def get_similarities_correct_answers(answer: str, df_t: pd.DataFrame()):
+    """
+    Get Cosine distance and similarities with Spacy library
+    """
     df_t['similarity_to_true'] = np.nan
     for i in df_t.index:
         res = nlp(answer).similarity(nlp(df_t.answer[i]))
