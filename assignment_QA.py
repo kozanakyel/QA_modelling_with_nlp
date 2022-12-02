@@ -83,14 +83,14 @@ def get_similarities_correct_answers(answer: str, df_t: pd.DataFrame()):
         res = nlp(answer).similarity(nlp(df_t.answer[i]))
         df_t.at[i, 'similarity_to_true'] = res
 
-def get_score_with_BERT_SQUAD(df_t: pd.DataFrame()) -> list:
+def get_score_with_BERT_SQUAD(df_t: pd.DataFrame(), quest: str) -> list:
 
     tokenizer = DistilBertTokenizer.from_pretrained("distilbert-base-cased-distilled-squad")
     model = TFDistilBertForQuestionAnswering.from_pretrained("distilbert-base-cased-distilled-squad")
 
     score_list = []
     for index, ans_ind, ans, *sent in df_t.itertuples():
-        question, text = "How does the abstraction helps engineering ?", df_t.answer[index]
+        question, text = quest, df_t.answer[index]
 
         question_answerer = pipeline("question-answering", model = model, tokenizer= tokenizer)
 
@@ -176,28 +176,33 @@ def get_result_with_mean(df_t: pd.DataFrame()):
     df_t['get_mean_all_results'] = (df_t['similarity_to_true'] + df_t['score_label'] + df_t['get_multiqa_score'])/3
 
 if __name__ == '__main__':
-    df = pd.read_csv('/mnt/c/Users/kozan/Desktop/NLP/QA_modelling_with_nlp/QAs.txt',usecols=[0,1], 
+    PATH_QA_DOC = '/mnt/c/Users/kozan/Desktop/NLP/QA_modelling_with_nlp/QAs.txt'
+    PATH_RESULT = '/mnt/c/Users/kozan/Desktop/NLP/QA_modelling_with_nlp/result_table.csv'
+    TRUE_PROVIDED_ANSWER = 'Abstraction, or the process of generalizing ideas by understanding examples, is an indispensable tool in the engineering process'
+    ORIGINAL_QUESTION = "How does the abstraction helps engineering ?"
+
+    df = pd.read_csv(PATH_QA_DOC, usecols=[0,1], 
             names=['ans_index', 'answer'], header=None, sep='\t')
     df = cleaning_data(df)
     add_sent_numbers(df)
     auto_correct_spelling_words(df)
 
-    print(f'GIVE AN CORRECT ANSWER AND TYPE **ENTER** FOR INPUT:\n')
-    query = input()
+    get_multi_qa_score(df, ORIGINAL_QUESTION)
 
-    question = "How does the abstraction helps engineering ?"
-    get_multi_qa_score(df, question)
-
-    score_list = get_score_with_BERT_SQUAD(df)
+    score_list = get_score_with_BERT_SQUAD(df, ORIGINAL_QUESTION)
     add_score_and_status_binary(score_list, df)
     
     correct_answer_sentences = extract_answer_from_complete_text(df)
     print(f'\n\n#############Correct Answer From compound Answer Text is ########### \n\"{correct_answer_sentences}\"')
-    get_similarities_correct_answers(query, df)
+
+    get_similarities_correct_answers(TRUE_PROVIDED_ANSWER, df)
 
     create_pipeline_tfid_and_model(LinearSVC(), df, 'LinearSVC')
     create_pipeline_tfid_and_model(XGBClassifier(), df, 'Xgboost')
 
     get_result_with_mean(df)
 
-    df.to_csv('/mnt/c/Users/kozan/Desktop/NLP/project_assignment/result_table.csv')
+    for i in df.index:
+        print(f'{df["ans_index"][i]:3}. answer, score: {int(df["get_mean_all_results"][i]*100)}') 
+
+    df.to_csv(PATH_RESULT)
