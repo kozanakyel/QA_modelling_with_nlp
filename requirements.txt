@@ -1,0 +1,9 @@
+nltk
+spacy
+pandas
+textbolb
+transformers
+sklearn
+tensorflow
+xgboost
+numpy
